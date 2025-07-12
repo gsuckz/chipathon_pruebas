@@ -1,0 +1,106 @@
+** sch_path: /foss/designs/chipathon_pruebas/xschem/tb_pd.sch
+**.subckt tb_pd
+V1 v GND 3.3
+V2 ph2 GND PULSE(0 3.3 10n 10p 10p 26.18n 52.36n)
+X3 v GND ph1 ph1_ed edge_detector
+X4 pwm net1 ph1_ed v GND nor_gate
+X5 net1 net2 pwm v GND nor_gate
+X6 v GND ph2 net2 edge_detector
+V3 ph1 GND PULSE(0 3.3 0n 10p 10p 10n 20n)
+**** begin user architecture code
+
+.include /foss/pdks/gf180mcuC/libs.tech/ngspice/design.ngspice
+.lib /foss/pdks/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.lib /foss/pdks/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_statistical
+.lib /foss/pdks/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+
+
+
+.param f=10e6
+
+
+.control
+save all
+tran 1p 500n
+plot {ph1 + 5} {ph2 + 10} pwm
+plot ph1 ph1_ed
+
+.endc
+
+**** end user architecture code
+**.ends
+
+* expanding   symbol:  edge_detector.sym # of pins=4
+** sym_path: /foss/designs/chipathon_pruebas/xschem/edge_detector.sym
+** sch_path: /foss/designs/chipathon_pruebas/xschem/edge_detector.sch
+.subckt edge_detector V gnd in out
+*.iopin in
+*.iopin out
+*.iopin gnd
+*.iopin V
+X1 V gnd net1 net2 inv_gate
+X2 net2 in gnd V out and_gate
+X3 V gnd net3 net1 inv_gate
+X4 V gnd net4 net3 inv_gate
+X5 V gnd net5 net4 inv_gate
+X6 V gnd in net5 inv_gate
+.ends
+
+
+* expanding   symbol:  nor_gate.sym # of pins=5
+** sym_path: /foss/designs/chipathon_pruebas/xschem/nor_gate.sym
+** sch_path: /foss/designs/chipathon_pruebas/xschem/nor_gate.sch
+.subckt nor_gate out B A V gnd
+*.iopin A
+*.iopin out
+*.iopin gnd
+*.iopin V
+*.iopin B
+XM5 out A gnd gnd nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM6 out B net1 V pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM1 out B gnd gnd nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM2 net1 A V V pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+.ends
+
+
+* expanding   symbol:  inv_gate.sym # of pins=4
+** sym_path: /foss/designs/chipathon_pruebas/xschem/inv_gate.sym
+** sch_path: /foss/designs/chipathon_pruebas/xschem/inv_gate.sch
+.subckt inv_gate V gnd in out
+*.iopin in
+*.iopin out
+*.iopin gnd
+*.iopin V
+XM3 out in gnd gnd nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM4 out in V V pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+.ends
+
+
+* expanding   symbol:  and_gate.sym # of pins=5
+** sym_path: /foss/designs/chipathon_pruebas/xschem/and_gate.sym
+** sch_path: /foss/designs/chipathon_pruebas/xschem/and_gate.sch
+.subckt and_gate A B gnd V out
+*.iopin A
+*.iopin out
+*.iopin gnd
+*.iopin V
+*.iopin B
+X1 V gnd net1 out inv_gate
+XM6 net1 B V V pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM1 net2 A gnd gnd nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM3 net1 B net2 gnd nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM2 net1 A V V pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+.ends
+
+.GLOBAL GND
+.end
